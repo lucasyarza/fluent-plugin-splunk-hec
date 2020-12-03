@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ruby-25
+FROM registry.access.redhat.com/ubi8/ruby-27
 
 ARG VERSION
 
@@ -18,12 +18,14 @@ USER root
 COPY *.gem /tmp/
 COPY licenses /licenses
 
-RUN wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \
-      chmod +x ./jq && \
-      cp jq /usr/bin
+RUN dnf install -y jq
 
 COPY Gemfile* ./
-RUN gem install bundler \
+RUN yum update -y \
+   && npm install -g n \
+   && yum remove -y nodejs \
+   && n lts \
+   && gem install bundler \
    && gem unpack /tmp/*.gem --target gem \
    && bundle install 
 
